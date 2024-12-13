@@ -1,22 +1,22 @@
 package io.github.diegobloise.snake;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main extends ApplicationAdapter {
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all
+ * platforms.
+ */
+public class Main implements ApplicationListener {
 
     private final int CELL_SIZE = 20;
     private final int LINES = 25;
@@ -35,6 +35,7 @@ public class Main extends ApplicationAdapter {
         LEFT,
         RIGHT
     };
+
     Direction currentDirection;
 
     private ShapeRenderer shape;
@@ -62,7 +63,7 @@ public class Main extends ApplicationAdapter {
     void checkCollisions() {
         // Verifica se a cabeça da cobra está fora dos limites
         if (snake.get(0).x < 0 || snake.get(0).x >= LINES || snake.get(0).y < 0 ||
-            snake.get(0).y >= COLUMNS) {
+                snake.get(0).y >= COLUMNS) {
             setupGame();
         }
 
@@ -83,7 +84,7 @@ public class Main extends ApplicationAdapter {
         }
 
         // for (int i = 1; i < snakeLength; i++) {
-        //     snake[i] = snake[];
+        // snake[i] = snake[];
         // }
 
         // Atualiza a cabeça da cobra
@@ -110,19 +111,21 @@ public class Main extends ApplicationAdapter {
     }
 
     private void getInput() {
-        if ((Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) && currentDirection != Direction.DOWN)
+        if ((Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP))
+                && currentDirection != Direction.DOWN)
             currentDirection = Direction.UP;
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) && currentDirection != Direction.UP)
+        if ((Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN))
+                && currentDirection != Direction.UP)
             currentDirection = Direction.DOWN;
 
         if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) &&
-            currentDirection != Direction.RIGHT) {
+                currentDirection != Direction.RIGHT) {
             currentDirection = Direction.LEFT;
         }
 
         if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) &&
-            currentDirection != Direction.LEFT) {
+                currentDirection != Direction.LEFT) {
             currentDirection = Direction.RIGHT;
         }
     }
@@ -140,7 +143,8 @@ public class Main extends ApplicationAdapter {
     private void drawSnake() {
         shape.begin(ShapeRenderer.ShapeType.Filled);
         for (int i = 0; i < snake.size() - 1; i++) {
-            shape.setColor(i == 0 ? new Color(0 / 255f, 228 / 255f, 48 / 255f, 255 / 255f) : new Color(0 / 255f, 117 / 255f, 44 / 255f, 255 / 255f));
+            shape.setColor(i == 0 ? new Color(0 / 255f, 228 / 255f, 48 / 255f, 255 / 255f)
+                    : new Color(0 / 255f, 117 / 255f, 44 / 255f, 255 / 255f));
             shape.rect(snake.get(i).x * CELL_SIZE, snake.get(i).y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
         shape.end();
@@ -155,7 +159,7 @@ public class Main extends ApplicationAdapter {
 
     private void drawGrid() {
         shape.begin(ShapeRenderer.ShapeType.Line);
-        shape.setColor(new Color(25 / 255f,25 / 255f,25 / 255f,255 / 255f));
+        shape.setColor(new Color(25 / 255f, 25 / 255f, 25 / 255f, 255 / 255f));
         for (int line = 0; line <= SCREEN_WIDTH; line += CELL_SIZE) {
             shape.line(line, 0, line, SCREEN_HEIGHT);
             shape.line(0, line, SCREEN_WIDTH, line);
@@ -171,11 +175,26 @@ public class Main extends ApplicationAdapter {
     }
 
     @Override
+    public void resize(int width, int height) {
+        // Resize your application here. The parameters represent the new window size.
+    }
+
+    @Override
     public void render() {
         ScreenUtils.clear(Color.BLACK);
         input();
         logic();
         draw();
+    }
+
+    @Override
+    public void pause() {
+        // Invoked when your application is paused.
+    }
+
+    @Override
+    public void resume() {
+        // Invoked when your application is resumed after pause.
     }
 
     @Override
