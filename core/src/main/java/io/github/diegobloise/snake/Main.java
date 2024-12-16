@@ -25,7 +25,8 @@ public class Main implements ApplicationListener {
     private final int SCREEN_HEIGHT = LINES * CELL_SIZE;
 
     private Vector2 apple = new Vector2();
-    private List<Vector2> snake = new ArrayList<>();
+    private Vector2 snakeHead;
+    private List<Vector2> snakeBody = new ArrayList<>();
 
     private int gameSpeed;
 
@@ -44,11 +45,9 @@ public class Main implements ApplicationListener {
         apple = null;
         while (apple == null) {
             Vector2 newApplePos = new Vector2(MathUtils.random(0, COLUMNS - 1), MathUtils.random(0, LINES - 1));
-            for (Vector2 segment : snake) {
-                if (newApplePos != segment) {
-                    apple = newApplePos;
-                    break;
-                }
+            if (!snakeBody.contains(newApplePos)) {
+                apple = newApplePos;
+                break;
             }
         }
     }
@@ -60,10 +59,10 @@ public class Main implements ApplicationListener {
 
         currentDirection = Direction.RIGHT;
 
-        snake.clear();
-        snake.add(new Vector2((int) (COLUMNS / 2f), (int) (LINES / 2f)));
+        snakeBody.clear();
+        snakeHead = new Vector2((int) (COLUMNS / 2f), (int) (LINES / 2f));
         for (int i = 1; i < 3; i++) {
-            snake.add(new Vector2(snake.get(0).x - i, snake.get(0).y));
+            snakeBody.add(new Vector2(snakeHead.x - i, snakeHead.y));
         }
 
         newApple();
@@ -71,14 +70,19 @@ public class Main implements ApplicationListener {
 
     void checkCollisions() {
         // Verifica se a cabeça da cobra está fora dos limites
-        if (snake.get(0).x < 0 || snake.get(0).x >= LINES || snake.get(0).y < 0 ||
-                snake.get(0).y >= COLUMNS) {
+        if (snakeHead.x < 0 || snakeHead.x >= LINES || snakeHead.y < 0 ||
+                snakeHead.y >= COLUMNS) {
             setupGame();
         }
 
-        if (snake.get(0).x == apple.x && snake.get(0).y == apple.y) {
-            snake.add(new Vector2());
-            if (snake.size() % 2 == 0) {
+        // Verifica se a cabeça da cobra colidiu contra o corpo
+        if (snakeBody.contains(snakeHead)) {
+            setupGame();
+        }
+
+        if (snakeHead.equals(apple)) {
+            snakeBody.add(new Vector2(snakeBody.get(snakeBody.size() - 1)));
+            if (snakeBody.size() % 2 == 0) {
                 gameSpeed++;
                 Gdx.graphics.setForegroundFPS(gameSpeed);
             }
@@ -87,24 +91,25 @@ public class Main implements ApplicationListener {
     }
 
     void updateSnake() {
+        snakeBody.get(0).set(snakeHead.x, snakeHead.y);
         // Atualiza a posição do corpo
-        for (int i = snake.size() - 1; i > 0; i--) {
-            snake.get(i).set(snake.get(i - 1));
+        for (int i = snakeBody.size() - 1; i > 0; i--) {
+            snakeBody.get(i).set(snakeBody.get(i - 1));
         }
 
         // Atualiza a cabeça da cobra
         switch (currentDirection) {
             case UP:
-                snake.get(0).y++;
+                snakeHead.y++;
                 break;
             case DOWN:
-                snake.get(0).y--;
+                snakeHead.y--;
                 break;
             case LEFT:
-                snake.get(0).x--;
+                snakeHead.x--;
                 break;
             case RIGHT:
-                snake.get(0).x++;
+                snakeHead.x++;
                 break;
         }
 
@@ -149,11 +154,17 @@ public class Main implements ApplicationListener {
 
     private void drawSnake() {
         shape.begin(ShapeRenderer.ShapeType.Filled);
-        for (int i = 0; i < snake.size() - 1; i++) {
-            shape.setColor(i == 0 ? new Color(0 / 255f, 228 / 255f, 48 / 255f, 255 / 255f)
-                    : new Color(0 / 255f, 117 / 255f, 44 / 255f, 255 / 255f));
-            shape.rect(snake.get(i).x * CELL_SIZE, snake.get(i).y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+        // Draw Snake Head
+        shape.setColor(new Color(0 / 255f, 228 / 255f, 48 / 255f, 255 / 255f));
+        shape.rect(snakeHead.x * CELL_SIZE, snakeHead.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+        // Draw Snake Body
+        for (Vector2 segment : snakeBody) {
+            shape.setColor(new Color(0 / 255f, 117 / 255f, 44 / 255f, 255 / 255f));
+            shape.rect(segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
+
         shape.end();
     }
 
