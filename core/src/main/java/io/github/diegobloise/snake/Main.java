@@ -41,7 +41,16 @@ public class Main implements ApplicationListener {
     private ShapeRenderer shape;
 
     private void newApple() {
-        apple.set(MathUtils.random(0, COLUMNS - 1), MathUtils.random(0, LINES - 1));
+        apple = null;
+        while (apple == null) {
+            Vector2 newApplePos = new Vector2(MathUtils.random(0, COLUMNS - 1), MathUtils.random(0, LINES - 1));
+            for (Vector2 segment : snake) {
+                if (newApplePos != segment) {
+                    apple = newApplePos;
+                    break;
+                }
+            }
+        }
     }
 
     void setupGame() {
@@ -51,13 +60,13 @@ public class Main implements ApplicationListener {
 
         currentDirection = Direction.RIGHT;
 
-        newApple();
-
         snake.clear();
         snake.add(new Vector2((int) (COLUMNS / 2f), (int) (LINES / 2f)));
         for (int i = 1; i < 3; i++) {
             snake.add(new Vector2(snake.get(0).x - i, snake.get(0).y));
         }
+
+        newApple();
     }
 
     void checkCollisions() {
@@ -83,10 +92,6 @@ public class Main implements ApplicationListener {
             snake.get(i).set(snake.get(i - 1));
         }
 
-        // for (int i = 1; i < snakeLength; i++) {
-        // snake[i] = snake[];
-        // }
-
         // Atualiza a cabeça da cobra
         switch (currentDirection) {
             case UP:
@@ -111,21 +116,23 @@ public class Main implements ApplicationListener {
     }
 
     private void getInput() {
-        if ((Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP))
-                && currentDirection != Direction.DOWN)
+        if ((Gdx.input.isKeyPressed(Input.Keys.W) ||
+                Gdx.input.isKeyPressed(Input.Keys.UP))
+                && currentDirection != Direction.DOWN) {
+
             currentDirection = Direction.UP;
+        } else if ((Gdx.input.isKeyPressed(Input.Keys.S) ||
+                Gdx.input.isKeyPressed(Input.Keys.DOWN))
+                && currentDirection != Direction.UP) {
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN))
-                && currentDirection != Direction.UP)
             currentDirection = Direction.DOWN;
-
-        if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) &&
+        } else if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) &&
                 currentDirection != Direction.RIGHT) {
-            currentDirection = Direction.LEFT;
-        }
 
-        if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) &&
+            currentDirection = Direction.LEFT;
+        } else if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) &&
                 currentDirection != Direction.LEFT) {
+
             currentDirection = Direction.RIGHT;
         }
     }
@@ -176,7 +183,6 @@ public class Main implements ApplicationListener {
 
     @Override
     public void resize(int width, int height) {
-        // Resize your application here. The parameters represent the new window size.
     }
 
     @Override
@@ -189,12 +195,10 @@ public class Main implements ApplicationListener {
 
     @Override
     public void pause() {
-        // Invoked when your application is paused.
     }
 
     @Override
     public void resume() {
-        // Invoked when your application is resumed after pause.
     }
 
     @Override
