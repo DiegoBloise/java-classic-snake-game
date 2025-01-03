@@ -53,7 +53,7 @@ public class Main implements ApplicationListener {
     }
 
     void setupGame() {
-        gameSpeed = 8;
+        gameSpeed = 10;
 
         Gdx.graphics.setForegroundFPS(gameSpeed);
 
@@ -61,7 +61,7 @@ public class Main implements ApplicationListener {
 
         snakeBody.clear();
         snakeHead = new Vector2((int) (COLUMNS / 2f), (int) (LINES / 2f));
-        for (int i = 1; i < 3; i++) {
+        for (int i = 1; i <= 3; i++) {
             snakeBody.add(new Vector2(snakeHead.x - i, snakeHead.y));
         }
 
